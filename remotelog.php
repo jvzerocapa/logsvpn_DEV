@@ -1,5 +1,5 @@
 <?php
-$mysqli = new mysqli("192.168.150.131", "root", "436904D31T3C@", "logsvpn");
+$mysqli = new mysqli("DB_HOST", "DB_USER", "DB_PASS", "DB_NAME");
 
 if ($mysqli->connect_error) {
     die("Erro na conexão: " . $mysqli->connect_error);
