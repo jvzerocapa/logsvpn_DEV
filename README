@@ -1,0 +1,82 @@
+Monitoramento de Conexões VPN MikroTik
+Descrição
+
+Este projeto permite monitorar conexões VPN de usuários em roteadores MikroTik, registrando logins e logouts em um banco de dados MySQL/MariaDB e exibindo em uma interface web com filtros modernos.
+O sistema registra informações como usuário, ação realizada, IP de origem, data/hora e duração da sessão.
+
+Funcionalidades
+
+Registro de logins e logouts de usuários VPN.
+
+Armazenamento em banco de dados MySQL/MariaDB.
+
+Interface web com tabela de registros e filtros por usuário, ação e data.
+
+Scripts de login e logout para MikroTik automatizam o envio dos dados.
+
+Compatível para rodar diretamente no servidor ou via Docker.
+
+Requisitos
+
+Servidor web com PHP 7 ou superior.
+
+Banco de dados MySQL ou MariaDB.
+
+MikroTik RouterOS com acesso ao terminal (Winbox ou SSH).
+
+Conexão de rede entre o MikroTik e o servidor PHP.
+
+Configuração
+1. Banco de Dados
+
+Crie um banco de dados específico para os logs VPN.
+
+Crie a tabela para armazenar: usuário, ação, IP, duração da sessão e timestamp.
+
+Configure as credenciais de conexão no script PHP.
+
+2. Script PHP (captura.php)
+
+Coloque o script em um diretório acessível pelo servidor web.
+
+Atualize apenas as credenciais do banco de dados no script.
+
+Teste a conexão para garantir que registros podem ser inseridos corretamente.
+
+3. Scripts MikroTik
+
+Crie dois scripts:
+
+VPN_LOGIN → acionado no login, envia usuário e IP para o PHP. 
+ex de script ->   /tool fetch url="http://SERVIDOR_ONDE_ESTÁ_O_ARQUIVO/captura.php" http-method=post http-data=("action=login&username=" . $user . "&ip=" . $address) keep-result=no 
+
+VPN_LOGOUT → acionado no logout, envia usuário, IP e duração da sessão.
+Ex de script -> /tool fetch url="http://SERVIDOR_ONDE_ESTÁ_O_ARQUIVO/captura.php" http-method=post http-data=("action=logout&username=" . $user . "&ip=" . $address . "&duration=" . $uptime) keep-result=no
+
+
+
+Configure os scripts em System → Scripts no MikroTik.
+
+Associe os scripts ao profile VPN em PPP → Profiles, nos campos On Login Script e On Logout Script.
+
+4. Docker (Opcional)
+
+O projeto inclui um Dockerfile para rodar todo o ambiente web em container.
+
+É possível construir a imagem e iniciar o serviço sem precisar configurar Apache/Nginx manualmente.
+
+Teste
+
+Conecte um usuário VPN e verifique se o login aparece no sistema.
+
+Desconecte o usuário e confirme se o logout e a duração da sessão foram registrados.
+
+Utilize os filtros na interface web para buscar por usuário, ação ou data.
+
+Personalizações
+
+Campos adicionais podem ser adicionados ao banco (perfil, tipo de conexão, dispositivo).
+
+A interface web pode ser estilizada com degradês, efeitos de fade e hover.
+
+Recomenda-se usar HTTPS para maior segurança na comunicação entre MikroTik e PHP.
