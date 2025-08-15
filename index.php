@@ -39,30 +39,36 @@ if (!$result) {
 <style>
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(to right, #f0f4f8, #d9e2ec);
+        background: linear-gradient(to right, #e0f7fa, #e1bee7);
         margin: 0;
         padding: 20px;
     }
 
     h1 {
         text-align: center;
-        color: #2c3e50;
-        margin-bottom: 20px;
+        color: #4a148c;
+        margin-bottom: 30px;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
     }
 
     /* Formulário */
     form {
-        background: linear-gradient(to right, #6a11cb, #2575fc);
+        background: linear-gradient(to right, #8e24aa, #3949ab);
         padding: 20px;
         border-radius: 12px;
         color: white;
         max-width: 900px;
-        margin: 0 auto 30px auto;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        margin: 0 auto 40px auto;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         display: flex;
         flex-wrap: wrap;
         gap: 15px;
         align-items: center;
+        transition: transform 0.3s ease;
+    }
+
+    form:hover {
+        transform: translateY(-3px);
     }
 
     form label {
@@ -71,8 +77,8 @@ if (!$result) {
     }
 
     form input, form select {
-        padding: 10px 12px;
-        border-radius: 6px;
+        padding: 12px 15px;
+        border-radius: 8px;
         border: none;
         outline: none;
         font-size: 14px;
@@ -81,14 +87,14 @@ if (!$result) {
     }
 
     form input:focus, form select:focus {
-        box-shadow: 0 0 8px rgba(255,255,255,0.8);
+        box-shadow: 0 0 10px rgba(255,255,255,0.9);
     }
 
     form button {
-        padding: 10px 20px;
-        border-radius: 6px;
+        padding: 12px 25px;
+        border-radius: 8px;
         border: none;
-        background:rgb(189, 40, 209);
+        background: #d81b60;
         color: white;
         cursor: pointer;
         font-weight: bold;
@@ -97,44 +103,54 @@ if (!$result) {
     }
 
     form button:hover {
-        background:rgb(123, 34, 134);
+        background: #880e4f;
     }
 
     /* Tabela */
     table {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
         background: white;
-        border-radius: 12px;
+        border-radius: 15px;
         overflow: hidden;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.15);
         transition: all 0.3s ease;
     }
 
     table tr {
-        transition: background 0.3s ease;
+        transition: background 0.3s ease, transform 0.2s ease;
     }
 
     table tr:hover {
-        background: linear-gradient(90deg, #dfe9f3, #ffffff);
+        background: linear-gradient(90deg, #f3e5f5, #e1f5fe);
+        transform: scale(1.01);
     }
 
     th {
-        background: linear-gradient(90deg, #6a11cb, #2575fc);
+        background: linear-gradient(90deg, #8e24aa, #3949ab);
         color: white;
-        padding: 12px;
+        padding: 15px;
         text-align: left;
+        font-size: 15px;
     }
 
     td {
-        padding: 12px;
+        padding: 15px;
         border-bottom: 1px solid #eee;
+        font-size: 14px;
+        color: #333;
+    }
+
+    td:first-child {
+        font-weight: bold;
+        color: #4a148c;
     }
 
     @media (max-width: 700px) {
         form {
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         form input, form select, form button {
