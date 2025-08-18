@@ -196,7 +196,8 @@ if (!$result) {
     <td><?=htmlspecialchars($row['id'])?></td>
     <td><?=htmlspecialchars($row['username'])?></td>
     <td><?=htmlspecialchars($row['action'])?></td>
-    <td><?=htmlspecialchars($row['created_at'])?></td>
+    <td><?= date('d/m/Y H:i:s', strtotime($row['created_at'])) ?></td>
+
 </tr>
 <?php endwhile; ?>
 </table>
