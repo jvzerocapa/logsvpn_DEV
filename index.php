@@ -48,6 +48,9 @@ if (!$result) {
         background: linear-gradient(to right, #e0f7fa, #e1bee7);
         margin: 0;
         padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
     }
 
     h1 {
@@ -70,7 +73,7 @@ if (!$result) {
         gap: 15px;
         align-items: center;
         justify-content: center;
-        flex-wrap: nowrap; /* tudo na mesma linha */
+        flex-wrap: nowrap;
         transition: transform 0.3s ease;
     }
 
@@ -156,12 +159,37 @@ if (!$result) {
 
     @media (max-width: 900px) {
         form {
-            flex-wrap: wrap; /* quebra em telas menores */
+            flex-wrap: wrap;
             justify-content: flex-start;
         }
         form input, form select, form button {
             flex: 1 1 150px;
         }
+    }
+
+    /* Rodapé */
+    footer {
+        margin-top: auto;
+        text-align: center;
+        padding: 15px;
+    }
+
+    footer .rodape {
+        display: inline-block;
+        background: white;
+        padding: 10px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    footer .rodape a {
+        color: #4a148c;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    footer .rodape a:hover {
+        text-decoration: underline;
     }
 </style>
 </head>
@@ -205,6 +233,16 @@ if (!$result) {
 </tr>
 <?php endwhile; ?>
 </table>
+
+<footer>
+  <div class="rodape">
+    <p>
+      <a href="https://github.com/jvzerocapa" target="_blank">
+        Powered by João Vitor
+      </a>
+    </p>
+  </div>
+</footer>
 
 </body>
 </html>
