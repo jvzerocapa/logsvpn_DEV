@@ -80,3 +80,16 @@ Campos adicionais podem ser adicionados ao banco (perfil, tipo de conexão, disp
 A interface web pode ser estilizada com degradês, efeitos de fade e hover.
 
 Recomenda-se usar HTTPS para maior segurança na comunicação entre MikroTik e PHP.
+
+Para criar a tabela use o seguinte comando sql.
+
+CREATE TABLE logs (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+    ip VARCHAR(20) COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+    action VARCHAR(10) COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+    duration INT DEFAULT 0,
+    created_at DATETIME DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
