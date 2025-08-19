@@ -7,7 +7,8 @@ require 'remotelog.php'; // apenas conexão
 
 $filtro_usuario = $_GET['usuario'] ?? '';
 $filtro_acao = $_GET['acao'] ?? '';
-$filtro_data = $_GET['data'] ?? '';
+$filtro_data_inicio = $_GET['data_inicio'] ?? '';
+$filtro_data_fim = $_GET['data_fim'] ?? '';
 
 $sql = "SELECT *, SEC_TO_TIME(duration) AS tempo_formatado 
         FROM ppp_logs 
@@ -19,8 +20,13 @@ if ($filtro_usuario) {
 if ($filtro_acao) {
     $sql .= " AND action = '" . $mysqli->real_escape_string($filtro_acao) . "'";
 }
-if ($filtro_data) {
-    $sql .= " AND DATE(created_at) = '" . $mysqli->real_escape_string($filtro_data) . "'";
+if ($filtro_data_inicio && $filtro_data_fim) {
+    $sql .= " AND DATE(created_at) BETWEEN '" . $mysqli->real_escape_string($filtro_data_inicio) . "' 
+                                        AND '" . $mysqli->real_escape_string($filtro_data_fim) . "'";
+} elseif ($filtro_data_inicio) {
+    $sql .= " AND DATE(created_at) >= '" . $mysqli->real_escape_string($filtro_data_inicio) . "'";
+} elseif ($filtro_data_fim) {
+    $sql .= " AND DATE(created_at) <= '" . $mysqli->real_escape_string($filtro_data_fim) . "'";
 }
 
 $sql .= " ORDER BY created_at DESC";
@@ -57,13 +63,14 @@ if (!$result) {
         padding: 20px;
         border-radius: 12px;
         color: white;
-        max-width: 900px;
+        max-width: 100%;
         margin: 0 auto 40px auto;
         box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         display: flex;
-        flex-wrap: wrap;
         gap: 15px;
         align-items: center;
+        justify-content: center;
+        flex-wrap: nowrap; /* tudo na mesma linha */
         transition: transform 0.3s ease;
     }
 
@@ -74,15 +81,16 @@ if (!$result) {
     form label {
         font-weight: bold;
         margin-right: 5px;
+        white-space: nowrap;
     }
 
     form input, form select {
-        padding: 12px 15px;
+        padding: 10px 12px;
         border-radius: 8px;
         border: none;
         outline: none;
         font-size: 14px;
-        flex: 1 1 150px;
+        min-width: 120px;
         transition: all 0.3s ease;
     }
 
@@ -99,7 +107,6 @@ if (!$result) {
         cursor: pointer;
         font-weight: bold;
         transition: all 0.3s ease;
-        flex: 0 0 auto;
     }
 
     form button:hover {
@@ -147,18 +154,13 @@ if (!$result) {
         color: #4a148c;
     }
 
-    @media (max-width: 700px) {
+    @media (max-width: 900px) {
         form {
-            flex-direction: column;
-            gap: 12px;
+            flex-wrap: wrap; /* quebra em telas menores */
+            justify-content: flex-start;
         }
-
         form input, form select, form button {
-            width: 100%;
-        }
-
-        table, th, td {
-            font-size: 14px;
+            flex: 1 1 150px;
         }
     }
 </style>
@@ -178,8 +180,11 @@ if (!$result) {
         <option value="logout" <?=($filtro_acao=='logout'?'selected':'')?>>Logout</option>
     </select>
 
-    <label>Data:</label>
-    <input type="date" name="data" value="<?=htmlspecialchars($filtro_data)?>">
+    <label>Data inicial:</label>
+    <input type="date" name="data_inicio" value="<?=htmlspecialchars($filtro_data_inicio)?>">
+
+    <label>Data final:</label>
+    <input type="date" name="data_fim" value="<?=htmlspecialchars($filtro_data_fim)?>">
 
     <button type="submit">Filtrar</button>
 </form>
@@ -197,7 +202,6 @@ if (!$result) {
     <td><?=htmlspecialchars($row['username'])?></td>
     <td><?=htmlspecialchars($row['action'])?></td>
     <td><?= date('d/m/Y H:i:s', strtotime($row['created_at'])) ?></td>
-
 </tr>
 <?php endwhile; ?>
 </table>
