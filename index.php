@@ -3,36 +3,53 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require 'remotelog.php'; // apenas conexão
+require 'remotelog.php'; // conexão
 
 $filtro_usuario = $_GET['usuario'] ?? '';
 $filtro_acao = $_GET['acao'] ?? '';
 $filtro_data_inicio = $_GET['data_inicio'] ?? '';
 $filtro_data_fim = $_GET['data_fim'] ?? '';
 
-$sql = "SELECT *, SEC_TO_TIME(duration) AS tempo_formatado 
-        FROM ppp_logs 
-        WHERE 1=1";
+// ---- PAGINAÇÃO ----
+$registros_por_pagina = isset($_GET['limit']) ? (int)$_GET['limit'] : 8; 
+if ($registros_por_pagina <= 0) $registros_por_pagina = 8;
+
+$pagina_atual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($pagina_atual <= 0) $pagina_atual = 1;
+
+$offset = ($pagina_atual - 1) * $registros_por_pagina;
+
+// ---- QUERY PRINCIPAL ----
+$sql_base = "FROM ppp_logs WHERE 1=1";
 
 if ($filtro_usuario) {
-    $sql .= " AND username LIKE '%" . $mysqli->real_escape_string($filtro_usuario) . "%'";
+    $sql_base .= " AND username LIKE '%" . $mysqli->real_escape_string($filtro_usuario) . "%'";
 }
 if ($filtro_acao) {
-    $sql .= " AND action = '" . $mysqli->real_escape_string($filtro_acao) . "'";
+    $sql_base .= " AND action = '" . $mysqli->real_escape_string($filtro_acao) . "'";
 }
 if ($filtro_data_inicio && $filtro_data_fim) {
-    $sql .= " AND DATE(created_at) BETWEEN '" . $mysqli->real_escape_string($filtro_data_inicio) . "' 
+    $sql_base .= " AND DATE(created_at) BETWEEN '" . $mysqli->real_escape_string($filtro_data_inicio) . "' 
                                         AND '" . $mysqli->real_escape_string($filtro_data_fim) . "'";
 } elseif ($filtro_data_inicio) {
-    $sql .= " AND DATE(created_at) >= '" . $mysqli->real_escape_string($filtro_data_inicio) . "'";
+    $sql_base .= " AND DATE(created_at) >= '" . $mysqli->real_escape_string($filtro_data_inicio) . "'";
 } elseif ($filtro_data_fim) {
-    $sql .= " AND DATE(created_at) <= '" . $mysqli->real_escape_string($filtro_data_fim) . "'";
+    $sql_base .= " AND DATE(created_at) <= '" . $mysqli->real_escape_string($filtro_data_fim) . "'";
 }
 
-$sql .= " ORDER BY created_at DESC";
+// ---- TOTAL DE REGISTROS ----
+$sql_count = "SELECT COUNT(*) AS total " . $sql_base;
+$total_result = $mysqli->query($sql_count);
+$total_registros = $total_result->fetch_assoc()['total'];
+$total_paginas = ceil($total_registros / $registros_por_pagina);
+
+// ---- BUSCA COM LIMIT ----
+$sql = "SELECT *, SEC_TO_TIME(duration) AS tempo_formatado 
+        $sql_base 
+        ORDER BY created_at DESC 
+        LIMIT $registros_por_pagina OFFSET $offset";
 
 $result = $mysqli->query($sql);
-
 if (!$result) {
     die("Erro na consulta SQL: " . $mysqli->error);
 }
@@ -43,7 +60,7 @@ if (!$result) {
 <meta charset="UTF-8">
 <title>Logs de Usuários</title>
 <style>
-    body {
+        body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background: linear-gradient(to right, #e0f7fa, #e1bee7);
         margin: 0;
@@ -191,6 +208,22 @@ if (!$result) {
     footer .rodape a:hover {
         text-decoration: underline;
     }
+/* seu CSS permanece igual */
+.pagination {
+    margin: 20px 0;
+    text-align: center;
+}
+.pagination a {
+    margin: 0 5px;
+    padding: 8px 12px;
+    background: #8e24aa;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+}
+.pagination a:hover {
+    background: #3949ab;
+}
 </style>
 </head>
 <body>
@@ -214,6 +247,14 @@ if (!$result) {
     <label>Data final:</label>
     <input type="date" name="data_fim" value="<?=htmlspecialchars($filtro_data_fim)?>">
 
+    <label>Por página:</label>
+    <select name="limit">
+        <option value="8" <?=($registros_por_pagina==8?'selected':'')?>>8</option>
+        <option value="25" <?=($registros_por_pagina==25?'selected':'')?>>25</option>
+        <option value="30" <?=($registros_por_pagina==30?'selected':'')?>>30</option>
+        <option value="50" <?=($registros_por_pagina==50?'selected':'')?>>50</option>
+    </select>
+
     <button type="submit">Filtrar</button>
 </form>
 
@@ -233,6 +274,22 @@ if (!$result) {
 </tr>
 <?php endwhile; ?>
 </table>
+
+<!-- Paginação -->
+<div class="pagination">
+<?php if ($pagina_atual > 1): ?>
+    <a href="?<?=http_build_query(array_merge($_GET,['pagina'=>$pagina_atual-1]))?>">Anterior</a>
+<?php endif; ?>
+
+<?php for($i=1; $i<=$total_paginas; $i++): ?>
+    <a href="?<?=http_build_query(array_merge($_GET,['pagina'=>$i]))?>"
+       style="<?=($i==$pagina_atual?'background:#d81b60;':'')?>"><?= $i ?></a>
+<?php endfor; ?>
+
+<?php if ($pagina_atual < $total_paginas): ?>
+    <a href="?<?=http_build_query(array_merge($_GET,['pagina'=>$pagina_atual+1]))?>">Próxima</a>
+<?php endif; ?>
+</div>
 
 <footer>
   <div class="rodape">
